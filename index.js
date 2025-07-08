@@ -18,7 +18,7 @@ ourAPP.get("/", (req, res) => {
 // Descripition   - To get a book
 // Access     - Public
 // Method     - GET
-// Parameter - book
+// Parameter - none
 //Body     - none
 ourAPP.get("/book",(req, res) => {
   return res.json({ books : Database.Book });
@@ -30,6 +30,36 @@ ourAPP.get("/book",(req, res) => {
 // Method     - GET
 // Parameter - bookID
 //Body     - none
+ourAPP.get("/book/:bookID",(req, res) => {
+  const getBook = Database.Book.filter(
+    (book) => book.ISBN === req.params.bookID
+  );
+  return res.json({ book: getBook });
+});
+// Route     - /book/c/:category
+// Descripition   - to get a list of books based on category
+// Access     - Public
+// Method     - GET
+// Parameter - category
+//Body     - none
+ourAPP.get("/book/c/:category",(req, res) => {
+  const getBook = Database.Book.filter(
+    (book) => book.category.includes(req.params.category)
+  );
+  return res.json({ book: getBook });
+});
+// Route     - /book/c/:authors
+// Descripition   - to get a list of books based on author
+// Access     - Public
+// Method     - GET
+// Parameter - authors
+//Body     - none
+ourAPP.get("/book/a/:authors",(req, res) => {
+  const getBookByAuthor = Database.Book.filter(
+    (book) => book.authors.includes(parseInt(req.params.authors))
+  );
+  return res.json({ book: getBookByAuthor });
+});
 
 
 
