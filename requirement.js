@@ -24,32 +24,32 @@ Book
     - to get a list of books based on category ✅
     - to get a list of books based on author -> [Task]✅
  - POST
-    - to add new book✅
+    - to add new book
  - PUT
-    - to update book details✅
-    - to update/add new author✅
+    - to update book details
+    - to update/add new author
  - DELETE
-    - delete a book ✅
-    - delete an author from the book ✅
+    - delete a book 
+    - delete an author from the book 
 Authors
  - GET
     - to get all authors ✅
-    - to get specific author -> [Task] ✅
+    - to get specific author -> ✅
     - to get list of author based on a book ✅
  - POST
-    - to add new author✅
-    - to update/add new book -> [Task] 🔥
+    - to add new author
+    - to update/add new book ->
  - PUT
     - update author details
  - DELETE
     - delete an author
 Publication
  - GET
-    - to get all publication -> [Task] 🔥
-    - to get specific publication -> [Task] 🔥 
-    - to get a list of publication based on a book. -> [Task] 🔥
+    - to get all publication -> done
+    - to get specific publication -> done
+    - to get a list of publication based on a book. -> done
  - POST
-    - Add new publication✅
+    - Add new publication
  - PUT
     - update publication 
     - to update/add new book
