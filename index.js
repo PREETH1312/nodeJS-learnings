@@ -137,4 +137,42 @@ ourAPP.get("/publication/p/:book",(req, res) => {
   return res.json({ publication: getPublicationbyBook });
 });
 
+// Route     - /book/new
+// Descripition   - to add new book
+// Access     - Public
+// Method     - post
+// Parameter - none
+//Body     - none
+
+ourAPP.post("/book/new", (req,res) => {
+   console.log(req.body);
+    return res.json({ message: "book added successfully" });
+});
+
+// Route     - /author/new
+// Descripition   - to add new author
+// Access     - Public
+// Method     - post
+// Parameter - none
+//Body     - none
+ourAPP.post("/author/new", (req,res) => {
+   const {newAuthor} = req.body;
+   console.log(newAuthor);
+    return res.json({ message: "author was added!"});
+});
+
+// Route     - /publication/new
+// Descripition   - to add new publication
+// Access     - Public
+// Method     - post
+// Parameter - none
+//Body     - none
+ourAPP.post("/publication/new", (req,res) => {
+   const {publication} = req.body;
+   console.log(publication);
+    return res.json({ message: "publication was added!"});
+});
+
+
+
 ourAPP.listen(4000, () => console.log("Server is running"));
