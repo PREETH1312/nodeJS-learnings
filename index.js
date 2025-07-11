@@ -172,7 +172,67 @@ ourAPP.post("/publication/new", (req,res) => {
    console.log(publication);
     return res.json({ message: "publication was added!"});
 });
+// Route     - /book/update
+// Descripition   - update/ to add new book
+// Access     - Public
+// Method     - put
+// Parameter - isbn
 
+ourAPP.put("/book/update/:isbn" ,(req,res) => {
+  const {updatedBook} =req.body;
+  const{isbn} = req.params;
+   const book=Database.Book.map((book) => {
+    if(book.ISBN === isbn) {
+      return{...book,...updatedBook}
+    }
+    return book;
+  });
+  return res.json(Database.Book);
+});
+
+// Route     - /bookAuthor/update/:isbn
+// Descripition   -update/ to add new author to a book
+// Access     - Public
+// Method     - put
+// Parameter - isbn
+ourAPP.put("/bookAuthor/update/:isbn" ,(req,res) => {
+  const {newAuthor} =req.body;
+  const{isbn} = req.params;
+   const book= Database.Book.map((book) => {
+    if(book.ISBN === isbn) {
+      if(!book.authors.includes(newAuthor)){
+         return book.authors.push(newAuthor);
+      }
+      return book;
+    }
+    return book;
+  });
+  const author =Database.Author.map((author) => {
+    if(author.id === newAuthor) {
+      if (!author.books.includes(isbn)){
+        return author.books.push(isbn);
+      }
+      return author;
+    }
+    return author;
+  })
+  return res.json({book:book,author:author});
+});
+
+// Route     - /book/delete/:isbn
+// Descripition   - to delete a book
+// Access     - Public
+// Method     - delete
+// Parameter - none
+//Body     - none
+
+ourAPP.delete("/book/delete/:isbn", (req,res) => {
+  const{isbn} =req.params;
+
+  const filteredBooks =Database.Book.filter((book) => book.ISBN !== isbn);
+  Database.Book =filteredBooks;
+  return res.json(Database.Book);
+});
 
 
 ourAPP.listen(4000, () => console.log("Server is running"));
