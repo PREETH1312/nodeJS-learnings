@@ -9,8 +9,9 @@ const PublicationModel = require('../schema/publication');
 // Method     - GET
 // Parameter - none
 //Body     - none
-Router.get("/publication",(req, res) => {
-  return res.json({ publications : Database.Publication });
+Router.get("/publication",async (req, res) => {
+  const getAllPublication =await PublicationModel.find();
+  return res.json(getAllPublication);
 });
 // Route     - /publication/:publicationID
 // Descripition   -to get specific publication
@@ -18,11 +19,9 @@ Router.get("/publication",(req, res) => {
 // Method     - GET
 // Parameter - publicationID
 //Body     - none
-Router.get("/publication/:publicationID",(req, res) => {
-  const getPublication = Database.Publication.filter(
-    (publication) => publication.name === req.params.publicationID
-  );
-  return res.json({ publication: getPublication });
+Router.get("/publication/:publicationID",async(req, res) => {
+  const getSpecificPublication =await PublicationModel.findOne({ISBN: req.params.publicationID});
+  return res.json({ book: getSpecificPublication });
 });
 
 // Route     - /publication/p/:book
@@ -31,11 +30,14 @@ Router.get("/publication/:publicationID",(req, res) => {
 // Method     - GET
 // Parameter - publication
 //Body     - none
-Router.get("/publication/p/:book",(req, res) => {
-  const getPublicationbyBook = Database.Publication.filter(
-    (publication) => publication.books.includes((req.params.book))
-  );
-  return res.json({ publication: getPublicationbyBook });
+Router.get("/publication/p/:book", async(req, res) => {
+ const getSpecificPublication = await BookModel.find({
+  book: req.params.book,
+ });
+ if(!getSpecificPublication){
+  return res.json({error: `No publication found for the book of ${req.params.book}`});
+ }
+ return res.json({books:getSpecificPublication});
 });
 // Route     - /publication/new
 // Descripition   - to add new publication
@@ -43,10 +45,16 @@ Router.get("/publication/p/:book",(req, res) => {
 // Method     - post
 // Parameter - none
 //Body     - none
-Router.post("/publication/new", (req,res) => {
-   const {publication} = req.body;
-   console.log(publication);
-    return res.json({ message: "publication was added!"});
+Router.post("/publication/new", async(req,res) => {
+    try{
+    const{newPublication} = req.body;
+    await Publication.create(newPublication);
+    return res.json({message: 'Publication added to the database'})
+
+   }catch(Error){
+    return res.json({error: error.message})
+   }
+    return res.json({ message: "Publication added successfully" });
 });
 
 
