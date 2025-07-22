@@ -3,6 +3,12 @@ const express = require("express");
 
 const mongoose = require('mongoose');
 
+//importing Different Schemas
+const Book = require('./schema/book');
+const Author = require('./schema/author');
+const Publication = require('./schema/publication');
+
+
 //database
 const Database = require("./database");
 
@@ -12,6 +18,7 @@ mongoose.connect(process.env.MONGO_URI,{
   console.log(Error);
 });
 const { default: anymatch } = require("anymatch");
+const BookModel = require("./schema/book");
 
 //initialization
 const ourAPP = express();
@@ -30,10 +37,10 @@ ourAPP.get("/", (req, res) => {
 // Method     - GET
 // Parameter - none
 //Body     - none
-ourAPP.get("/book",(req, res) => {
-  return res.json({ books : Database.Book });
+ourAPP.get("/book", async (req, res) => {
+  const getAllBooks =await Book.find();
+  return res.json(getAllBooks);
 });
-
 
 // Route     - /book/:bookID
 // Descripition   - To get a book based on ISBN
@@ -41,11 +48,9 @@ ourAPP.get("/book",(req, res) => {
 // Method     - GET
 // Parameter - bookID
 //Body     - none
-ourAPP.get("/book/:bookID",(req, res) => {
-  const getBook = Database.Book.filter(
-    (book) => book.ISBN === req.params.bookID
-  );
-  return res.json({ book: getBook });
+ourAPP.get("/book/:bookID", async(req, res) => {
+  const getSpecificBook =await Book.findOne({ISBN: req.params.bookID});
+  return res.json({ book: getSpecificBook });
 });
 
 // Route     - /book/c/:category
@@ -54,11 +59,14 @@ ourAPP.get("/book/:bookID",(req, res) => {
 // Method     - GET
 // Parameter - category
 //Body     - none
-ourAPP.get("/book/c/:category",(req, res) => {
-  const getBook = Database.Book.filter(
-    (book) => book.category.includes(req.params.category)
-  );
-  return res.json({ book: getBook });
+ourAPP.get("/book/c/:category", async (req, res) => {
+ const getSpecificBooks = await BookModel.find({
+  category: req.params.category,
+ });
+ if(!getSpecificBooks){
+  return res.json({error: `No book found for the category of ${req.params.category}`});
+ }
+ return res.json({books:getSpecificBooks});
 });
 // Route     - /book/a/:authors
 // Descripition   - to get a list of books based on author
@@ -80,8 +88,9 @@ ourAPP.get("/book/a/:authors",(req, res) => {
 // Parameter - none
 //Body     - none
 
-ourAPP.get("/author",(req, res) => {
-  return res.json({ author : Database.Author });
+ourAPP.get("/author", async(req, res) => {
+  const getAllAuthors = await Author.find();
+  return res.json(getAllAuthors);
 });
 
 // Route     - /author/:authorID
@@ -153,8 +162,15 @@ ourAPP.get("/publication/p/:book",(req, res) => {
 // Parameter - none
 //Body     - none
 
-ourAPP.post("/book/new", (req,res) => {
-   console.log(req.body);
+ourAPP.post("/book/new", async (req,res) => {
+   try{
+    const{newBook} = req.body;
+    await Book.create(newBook);
+    return res.json({message: 'Book added to the database'})
+
+   }catch(Error){
+    return res.json({error: error.message})
+   }
     return res.json({ message: "book added successfully" });
 });
 
@@ -166,8 +182,10 @@ ourAPP.post("/book/new", (req,res) => {
 //Body     - none
 ourAPP.post("/author/new", (req,res) => {
    const {newAuthor} = req.body;
-   console.log(newAuthor);
-    return res.json({ message: "author was added!"});
+
+   Author.create(newAuthor);
+
+    return res.json({ message: "Author added to the database"});
 });
 
 // Route     - /publication/new
@@ -187,45 +205,62 @@ ourAPP.post("/publication/new", (req,res) => {
 // Method     - put
 // Parameter - isbn
 
-ourAPP.put("/book/update/:isbn" ,(req,res) => {
-  const {updatedBook} =req.body;
-  const{isbn} = req.params;
-   const book=Database.Book.map((book) => {
-    if(book.ISBN === isbn) {
-      return{...book,...updatedBook}
-    }
-    return book;
-  });
-  return res.json(Database.Book);
+ourAPP.put("/book/update/:isbn" , async(req,res) => {
+  const { title }=req.body.title;
+  const updateBook = await Book.findOneAndUpdate(
+  {
+    ISBN: req.params.isbn,
+  },
+  {
+    title:title,
+  },
+  {
+    new:true,
+  }
+  )
+  return res.json({book:updateBook});
 });
 
 // Route     - /bookAuthor/update/:isbn
-// Descripition   -update/ to add new author to a book
+// Descripition   -update/add new author to a book
 // Access     - Public
 // Method     - put
 // Parameter - isbn
-ourAPP.put("/bookAuthor/update/:isbn" ,(req,res) => {
+ourAPP.put("/bookAuthor/update/:isbn" ,async(req,res) => {
   const {newAuthor} =req.body;
   const{isbn} = req.params;
-   const book= Database.Book.map((book) => {
-    if(book.ISBN === isbn) {
-      if(!book.authors.includes(newAuthor)){
-         return book.authors.push(newAuthor);
-      }
-      return book;
-    }
-    return book;
-  });
-  const author =Database.Author.map((author) => {
-    if(author.id === newAuthor) {
-      if (!author.books.includes(isbn)){
-        return author.books.push(isbn);
-      }
-      return author;
-    }
-    return author;
-  })
-  return res.json({book:book,author:author});
+  const updateBook = await Book.findOneAndUpdate(
+    {
+      ISBN:isbn,
+    },
+    {
+      $addToSet:{
+        authors:newAuthor,
+      },
+    },
+    {
+      new: true,
+    },
+  );
+ const updateAuthor = await Author.findOneAndUpdate(
+  {
+    id:newAuthor,
+  },
+  {
+    $addToSet:{
+      books: isbn
+    },
+  },
+  {
+    new:true,
+  }
+ );
+ return res.json({
+  books:updatedBook,
+  authors:updatedAuthor,
+  message:`New author was added into the database`
+ });
+
 });
 
 // Route     - /book/delete/:isbn

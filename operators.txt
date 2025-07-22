@@ -1,0 +1,28 @@
+Basic operators which you find in javascripi are
+1.Arithmetic operators(+,-,/,*,%,++,--,)
+2.comparison (Relational) operators (==,===,!=,!==,>,>=, <,<=)
+3.Bitwise operators (&,|,<<,>>)
+4.Logical operators (&&,||,!)
+5.Assignment operators(=,+=,-=,*=,%=)
+
+MongoDb operators -> Powerfull yet devs won't use them
+
+Array [1,2,3,4]
+$push
+$pop remove the last element
+$pull remove a specific element we want to delete
+$pull example: $pull { authors: 1}
+$addToSet -> clever way of pushing data into array 
+
+$inc 
+example: $inc { postCount:+1} postCount 1->2
+$min
+example: $min {amount}
+$max
+$set  to add a value
+example:$set {
+    name:"",
+    age:"",
+
+}
+$unset to remove a value 
