@@ -1,7 +1,7 @@
-const BookModel = require('./schema/book');
-const AuthorModel = require('./schema/author');
-
 const Router = require('express').Router();
+
+const BookModel = require('../schema/book');
+const AuthorModel = require('../schema/author');
 
 // Route     - /book
 // Descripition   - To get a book
@@ -151,7 +151,7 @@ return res.json({message:`Author was deleted`,book:updatedBook,author:updatedAut
 // Access     - Public
 // Method     - put
 // Parameter - isbn
-ourAPP.put("/bookAuthor/update/:isbn" ,async(req,res) => {
+Router.put("/bookAuthor/update/:isbn" ,async(req,res) => {
   const {newAuthor} =req.body;
   const{isbn} = req.params;
   const updateBook = await Book.findOneAndUpdate(

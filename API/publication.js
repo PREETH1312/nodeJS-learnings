@@ -1,6 +1,8 @@
-const PublicationModel = require('./schema/publication');
-
 const Router = require('express').Router();
+
+const PublicationModel = require('../schema/publication');
+
+
 // Route     - /publication
 // Descripition   - To get all publication
 // Access     - Public
@@ -46,6 +48,8 @@ Router.post("/publication/new", (req,res) => {
    console.log(publication);
     return res.json({ message: "publication was added!"});
 });
+
+
 // Route     - /publication/delete/:id
 // Descripition   - to delete an publication
 // Access     - Public
