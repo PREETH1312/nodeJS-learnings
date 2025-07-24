@@ -1,9 +1,9 @@
 const Router = require('express').Router();
 
 const { Author } = require('../database');
-const BookModel = require('../schema/author');
+const AuthorModel = require('../schema/author');
 
-Router.get("/author", async(req, res) => {
+Router.get("/", async(req, res) => {
   const getAllAuthors = await AuthorModel.find();
   return res.json(getAllAuthors);
 });
@@ -13,16 +13,15 @@ Router.get("/author", async(req, res) => {
 // Method     - post
 // Parameter - none
 //Body     - none
-Router.post("/author/new", async(req,res) => {
+Router.post("/new", async(req,res) => {
  try{
     const{newAuthor} = req.body;
-    await Author.create(newAuthor);
+    await AuthorModel.create(newAuthor);
     return res.json({message: 'Author added to the database'})
 
-   }catch(Error){
+   }catch(error){
     return res.json({error: error.message})
-   }
-    return res.json({ message: "Author added successfully" });
+   };
 });
 
 // Route     - /author/:book
@@ -32,7 +31,7 @@ Router.post("/author/new", async(req,res) => {
 // Parameter - author
 //Body     - none
 
-Router.get("/author/b/:book",async(req, res) => {
+Router.get("/b/:book",async(req, res) => {
  const getSpecificAuthor = await AuthorModel.find({
   book: req.params.book,
  });
@@ -48,9 +47,9 @@ Router.get("/author/b/:book",async(req, res) => {
 // Method     - GET
 // Parameter - authorID
 //Body     - none
-Router.get("/author/:authorID", async(req, res) => {
-  const getSpecificAuthor =await AuthorModel.findOne({ISBN: req.params.authorID});
-  return res.json({ book: getSpecificAuthor });
+Router.get("/:authorID", async(req, res) => {
+  const getSpecificAuthor =await AuthorModel.findOne({id: req.params.authorID});
+  return res.json({ author: getSpecificAuthor });
 });
 
 // Route     - /author/delete/:id
@@ -59,12 +58,33 @@ Router.get("/author/:authorID", async(req, res) => {
 // Method     - delete
 // Parameter - id
 
-Router.delete("/author/delete/:id",async (req,res)=>{
-  const { id } =req.params;
-  const updateAuthorDatabase =await AuthorModel.findOneAndDelete({
-    ID:id
-  });
-  return res.json({authors: updateAuthorDatabase});
+Router.delete("/delete/:id",async (req,res)=>{
+  const {id} =req.params;
+  const updateAuthorModel =await AuthorModel.findOneAndDelete({
+    id:id  });
+  return res.json({authors: updateAuthorModel});
+});
+
+// Route     - /author/update
+// Descripition   - update/ to add new author
+// Access     - Public
+// Method     - put
+// Parameter - id
+
+Router.put("/update/:id" , async(req,res) => {
+  const { books }=req.body.books;
+  const updateAuthorModal = await AuthorModel.findOneAndUpdate(
+  {
+    id: req.params.id,
+  },
+  {
+    books:books,
+  },
+  {
+    new:true,
+  }
+  )
+  return res.json({author:updateAuthorModal});
 });
 
 module.exports = Router;

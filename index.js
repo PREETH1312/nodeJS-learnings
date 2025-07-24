@@ -38,5 +38,12 @@ ourAPP.get("/", (req, res) => {
     });
 });
 
+ourAPP.delete("/delete/:id",async (req,res)=>{
+  const {id} =req.params;
+  const updateAuthorModal =await AuthorModel.findOneAndDelete({
+    ID:id
+  });
+  return res.json({authors: updateAuthorModal});
+});
 
 ourAPP.listen(4000, () => console.log("Server is running"));
